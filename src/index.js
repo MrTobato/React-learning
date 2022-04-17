@@ -49,12 +49,13 @@ function Square (props) {
         history: [{
           squares: Array(9).fill(null),
         }],
+        stepNumber: 0,
         xIsNext: true
       };
     }
 
     handlClick(i) {
-      const history = this.state.history;
+      const history = this.state.history.slice(0, this.state.stepNumber + 1);
       const current = history[history.length - 1];
       const squares = current.squares.slice();
       if (calculatorWinner(squares) || squares[i]) {
@@ -65,21 +66,30 @@ function Square (props) {
         history: history.concat([{
           squares: squares,
         }]),
+        stepNumber: history.length,
         xIsNext: !this.state.xIsNext
+      });
+    }
+
+    JumpTo(step) {
+      this.setState({
+        stepNumber: step,
+        xIsNext: (step % 2) === 0,
       });
     }
 
     render() {
       const history = this.state.history;
-      const current = history[history.length - 1];
+      const current = history[this.state.stepNumber];
       const winner = calculatorWinner(current.squares);
       
       const moves = history.map((step, move) => {
         const desc = move ? 
           'Go to move #' + move :
           'Go to game start';
+
         return (
-          <li>
+          <li key={move}>
             <button onClick={() => this.JumpTo(move)}>{desc}</button>
           </li>
         );
@@ -89,8 +99,8 @@ function Square (props) {
       if (winner) {
         status = 'Winner: ' + winner;
       } else {
-        status = 'Next player: ' (this.state.xIsNext ? 'X' : 'O');
-      }
+        status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+      };
 
       return (
         <div className="game">
@@ -136,4 +146,11 @@ function Square (props) {
     <Game />,
     document.getElementById('root')
   );
-  
+
+// Если у вас есть дополнительное время или вы хотите попрактиковаться в новых навыках React, вот несколько идей по улучшению, которые вы можете добавить в игру в крестики-нолики, перечисленные в порядке возрастания сложности:
+// Отображение местоположения для каждого хода в формате (столбец, строка) в списке истории ходов.
+// Выделите текущий выбранный элемент в списке ходов.
+// Перепишите компонент Board, чтобы использовать два цикла для создания квадратов вместо их жесткого кодирования.
+// Добавьте кнопку-переключатель, которая позволяет сортировать ходы в порядке возрастания или убывания.
+// Когда кто-то выигрывает, выделите три квадрата, которые привели к победе.
+// Когда никто не выигрывает, выведите сообщение о ничье.
